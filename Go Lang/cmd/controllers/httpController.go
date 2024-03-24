@@ -82,13 +82,23 @@ func PostRequest(c *gin.Context) {
 // Put Requests
 
 func PutRequest(c *gin.Context) {
-	data := c.PostForm("data")
 
-	log.Info("PUT request received with data: " + data)
+	data, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Error("Error reading request body: " + err.Error())
+		c.JSON(400, gin.H{
+			"message": "Error reading request body",
+		})
+		return
+	}
+
+	dataStr := string(data)
+
+	log.Info("PUT request received with data: " + dataStr)
 
 	c.JSON(200, gin.H{
 		"message": "PUT request received",
-		"data":    data,
+		"data":    dataStr,
 	})
 }
 
