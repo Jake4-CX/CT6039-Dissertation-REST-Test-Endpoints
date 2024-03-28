@@ -3,7 +3,7 @@ name: Deploy to DigitalOcean and Update Cloudflare DNS
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy-and-update-dns:
