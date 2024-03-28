@@ -1,0 +1,58 @@
+name: Deploy to DigitalOcean and Update Cloudflare DNS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-and-update-dns:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DO_TOKEN }}
+
+    - name: Delete existing Droplet
+      run: |
+        existing_droplet_id=$(doctl compute droplet list --no-header --format ID,Name | grep example-go-api | awk '{print $1}')
+        if [ ! -z "$existing_droplet_id" ]; then
+          echo "Deleting existing droplet with ID $existing_droplet_id"
+          doctl compute droplet delete $existing_droplet_id --force
+        else
+          echo "No existing droplet to delete."
+        fi
+    - name: Deploy to DigitalOcean
+      run: |
+        doctl compute droplet create example-go-api \
+          --size s-1vcpu-1gb \
+          --image docker-25-0-3-x64 \
+          --region ams3 \
+          --user-data-file ./deployments/initialization-script.sh \
+          --ssh-keys your_ssh_key_id \
+          --wait
+      env:
+        DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
+
+    - name: Get Droplet IP
+      id: get-ip
+      run: |
+        droplet_ip=$(doctl compute droplet list --format PublicIPv4 --no-header | grep example-go-api | awk '{print $1}')
+        echo "::set-output name=ip::$droplet_ip"
+      env:
+        DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
+
+    - name: Update Cloudflare DNS Record
+      uses: rafaelperoco/actions-coudflare-dns@v2.5
+      with:
+        type: "A"
+        name: "example-go-api.load-test.jack.lat"
+        content: ${{ steps.get-ip.outputs.ip }}
+        ttl: 1
+        proxied: false
+        token: ${{ secrets.CLOUDFLARE_TOKEN }}
+        zone: ${{ secrets.CLOUDFLARE_ZONE }}

@@ -1,0 +1,40 @@
+# Build stage
+FROM golang:1.21.5 as builder
+
+# Enable CGO for sqlite.
+ENV CGO_ENABLED=1
+
+# Install gcc for CGO dependencies.
+RUN apt-get update && apt-get install -y gcc
+
+# Set the working directory inside the container.
+WORKDIR /app
+
+# Copy go mod and sum files to leverage Docker cache.
+COPY go.mod go.sum ./
+
+# Download all dependencies.
+RUN go mod download
+
+# Copy the rest of the application code.
+COPY . .
+
+# Navigate to the main application directory.
+WORKDIR /app/cmd
+
+# Build the application.
+RUN go build -o test-rest-api
+
+FROM golang:1.21.5
+
+# Copy neccessary resources
+COPY --from=builder /app/cmd/test-rest-api /app/test-rest-api
+
+COPY .env /app/.env
+
+# Set the working directory
+WORKDIR /app
+
+EXPOSE 8080
+
+CMD ["./test-rest-api"]
