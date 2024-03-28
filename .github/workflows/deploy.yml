@@ -52,7 +52,7 @@ jobs:
         DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
       
     - name: Update Cloudflare DNS Record
-      uses: rafaelperoco/actions-coudflare-dns@v2.5
+      uses: Jake4-CX/actions-cloudflare-dns@v1.0.0
       with:
         type: "A"
         name: "example-go-api.load-test.jack.lat"
