@@ -44,11 +44,13 @@ jobs:
     - name: Get Droplet IP
       id: get-ip
       run: |
-        droplet_ip=$(doctl compute droplet list --format PublicIPv4 --no-header | grep ${{ env.DROPLET_NAME }} | awk '{print $1}')
+        droplet_info=$(doctl compute droplet list --format "Name,PublicIPv4" --no-header | grep "example-go-api")
+        droplet_ip=$(echo "$droplet_info" | awk '{print $NF}') # $NF extracts the last field
+        echo "Captured IP Address for example-go-api: $droplet_ip"
         echo "::set-output name=ip::$droplet_ip"
       env:
         DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
-
+      
     - name: Update Cloudflare DNS Record
       uses: rafaelperoco/actions-coudflare-dns@v2.5
       with:
