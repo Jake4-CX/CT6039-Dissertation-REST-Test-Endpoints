@@ -9,6 +9,8 @@ on:
       - '**.md'
       - '**.yml'
       - 'LICENSE'
+  workflow_dispatch:
+
 env:
   IMAGE_NAME: "loadtest-test-api"
   DOCKER_FILE_PATH: "./GoLang/deployments/dockerfile"
