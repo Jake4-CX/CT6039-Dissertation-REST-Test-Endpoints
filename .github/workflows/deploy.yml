@@ -5,7 +5,7 @@ on:
     branches:
       - master
 env:
-  INITIALIZATION_SCRIPT_PATH: "./Go Lang/deployments/initialization-script.sh"
+  INITIALIZATION_SCRIPT_PATH: "./GoLang/deployments/initialization-script.sh"
 
 jobs:
   deploy-and-update-dns:
