@@ -28,6 +28,6 @@ echo "Pulling the Docker image..."
 sudo docker pull jake4/loadtest-test-api:latest
 
 echo "Running the Docker container..."
-sudo docker run -d -e REST_PORT=8080 -p 8080:8080 jake4/loadtest-test-api:latest
+sudo docker run -d -e REST_PORT=80 -p 80:80 jake4/loadtest-test-api:latest
 
 echo "Container deployed successfully!"

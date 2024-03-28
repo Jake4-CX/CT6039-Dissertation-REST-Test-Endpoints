@@ -35,6 +35,6 @@ COPY .env /app/.env
 # Set the working directory
 WORKDIR /app
 
-EXPOSE 8080
+EXPOSE 80
 
 CMD ["./test-rest-api"]
