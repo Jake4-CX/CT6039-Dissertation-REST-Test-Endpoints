@@ -1,7 +1,10 @@
 name: Deploy to DigitalOcean and Update Cloudflare DNS
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build and Push Docker image"]
+    types:
+      - completed
     branches:
       - master
 env:
