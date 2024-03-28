@@ -32,10 +32,10 @@ jobs:
       run: |
         doctl compute droplet create example-go-api \
           --size s-1vcpu-1gb \
-          --image docker-25-0-3-x64 \
+          --image docker-20-04 \
           --region ams3 \
           --user-data-file ${{ env.INITIALIZATION_SCRIPT_PATH }} \
-          --ssh-keys your_ssh_key_id \
+          --ssh-keys ${{ env.DO_SSH_KEY_ID }} \
           --wait
       env:
         DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
