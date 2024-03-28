@@ -5,6 +5,7 @@ on:
     branches:
       - master
 env:
+  DROPLET_NAME: "example-go-api"
   INITIALIZATION_SCRIPT_PATH: "./GoLang/deployments/initialization-script.sh"
 
 jobs:
@@ -21,7 +22,7 @@ jobs:
 
     - name: Delete existing Droplet
       run: |
-        existing_droplet_id=$(doctl compute droplet list --no-header --format ID,Name | grep example-go-api | awk '{print $1}')
+        existing_droplet_id=$(doctl compute droplet list --no-header --format ID,Name | grep ${{ env.DROPLET_NAME }} | awk '{print $1}')
         if [ ! -z "$existing_droplet_id" ]; then
           echo "Deleting existing droplet with ID $existing_droplet_id"
           doctl compute droplet delete $existing_droplet_id --force
@@ -30,7 +31,7 @@ jobs:
         fi
     - name: Deploy to DigitalOcean
       run: |
-        doctl compute droplet create example-go-api \
+        doctl compute droplet create ${{ env.DROPLET_NAME }} \
           --size s-1vcpu-1gb \
           --image docker-20-04 \
           --region ams3 \
@@ -43,7 +44,7 @@ jobs:
     - name: Get Droplet IP
       id: get-ip
       run: |
-        droplet_ip=$(doctl compute droplet list --format PublicIPv4 --no-header | grep example-go-api | awk '{print $1}')
+        droplet_ip=$(doctl compute droplet list --format PublicIPv4 --no-header | grep ${{ env.DROPLET_NAME }} | awk '{print $1}')
         echo "::set-output name=ip::$droplet_ip"
       env:
         DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
