@@ -47,7 +47,7 @@ jobs:
         droplet_info=$(doctl compute droplet list --format "Name,PublicIPv4" --no-header | grep "example-go-api")
         droplet_ip=$(echo "$droplet_info" | awk '{print $NF}') # $NF extracts the last field
         echo "Captured IP Address for example-go-api: $droplet_ip"
-        echo "::set-output name=ip::$droplet_ip"
+        echo "DROPLET_IP=$droplet_ip" >> $GITHUB_ENV
       env:
         DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
       
@@ -56,7 +56,7 @@ jobs:
       with:
         type: "A"
         name: "example-go-api.load-test.jack.lat"
-        content: ${{ steps.get-ip.outputs.ip }}
+        content: ${{ env.DROPLET_IP }}
         ttl: 1
         proxied: false
         token: ${{ secrets.CLOUDFLARE_TOKEN }}
